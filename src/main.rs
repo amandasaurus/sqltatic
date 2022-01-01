@@ -13,6 +13,7 @@ use tera::Tera;
 use tracing::{debug, error, info, span, trace, warn, Level};
 use tracing_subscriber::FmtSubscriber;
 
+/// context
 macro_rules! ctx {
 	() => { || format!("{}:{}", file!(), line!()) };
 	($msg:literal $(,)?) => { || format!("{}:{} {}", file!(), line!(), $msg) };
