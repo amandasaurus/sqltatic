@@ -1,6 +1,6 @@
 [package]
 name = "sqltatic"
-version = "0.1.0"
+version = "0.1.0-rc1"
 authors = ["Amanda McCann <amanda@technomancy.org>"]
 edition = "2021"
 repository = "https://github.com/amandasaurus/sqltatic"
