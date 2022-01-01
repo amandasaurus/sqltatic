@@ -1,0 +1,18 @@
+params:
+    host: localhost
+    database: gis
+
+pages:
+    - filename: "index.html"
+      template: index.html.tmpl
+      vars:
+          cities: "SELECT name FROM planet_osm_point WHERE tags->'place' = 'city';"
+
+    - filename: "city/{{name|slugify}}/index.html"
+      template: city.html.tmpl
+      filename_params: "SELECT name, osm_id FROM planet_osm_point WHERE tags->'place' = 'city';"
+  
+      vars:
+          tags: "SELECT (each(tags)).* FROM planet_osm_point WHERE tags->'place' = 'city' and osm_id = {{osm_id}};"
+          distances: "select st_distance(this.way::geography, other.way::geography) as distance_m, other.name from planet_osm_point as this, planet_osm_point other where this.osm_id = {{osm_id}} and this.osm_id != other.osm_id and other.tags->'place' = 'city';"
+  
