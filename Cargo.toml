@@ -3,6 +3,9 @@ name = "sqltatic"
 version = "0.1.0"
 authors = ["Amanda McCann <amanda@technomancy.org>"]
 edition = "2021"
+repository = "https://github.com/amandasaurus/sqltatic"
+license = "AGPL-3.0"
+description = "A static site generator for websites that show data from an SQL database"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
