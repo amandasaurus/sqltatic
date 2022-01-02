@@ -56,6 +56,10 @@ struct Config {
 
     #[serde(default)]
     sql_files: Vec<String>,
+
+
+    #[serde(default)]
+    every_page_vars: HashMap<String, String>,
 }
 
 fn path_push(p: &Path, pp: impl AsRef<Path>) -> PathBuf {
@@ -219,6 +223,14 @@ async fn main() -> Result<()> {
     debug!("loaded all templates");
     drop(_guard);
 
+    let mut global_base_tera_context = tera::Context::new();
+    for (varname, sql) in config.every_page_vars.iter() {
+        let res = client.query(sql.as_str(), &[]).await?;
+        let params = pg_results_to_vec_of_values(&res)?;
+        global_base_tera_context.insert(varname, &params);
+    }
+
+
     if config.pages.is_empty() {
         warn!("You have not specified any pages. Nothing to do here");
     }
@@ -256,7 +268,7 @@ async fn main() -> Result<()> {
                     path.parent().unwrap()
                 ))?;
 
-                let mut page_context = tera::Context::new();
+                let mut page_context = global_base_tera_context.clone();
                 for (varname, sql_tmpl) in page.vars.iter() {
                     trace!(var=?varname, "Page variable");
                     let sql = tera.render_str(sql_tmpl, &page_filename_param_context)?;
@@ -292,7 +304,7 @@ async fn main() -> Result<()> {
             debug!("Single page");
 
             path.push(&page.filename);
-            let mut page_context = tera::Context::new();
+            let mut page_context = global_base_tera_context.clone();
 
             for (varname, sql) in &page.vars {
                 let span = span!(Level::INFO, "Variable", ?varname);
