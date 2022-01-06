@@ -323,6 +323,10 @@ async fn main() -> Result<()> {
             let final_html = tera.render(&page.template, &page_context)?;
             debug!("rendered HTML");
 
+            std::fs::create_dir_all(&path.parent().unwrap()).with_context(ctx!(
+                "Creating path for output file: {:?}",
+                path.parent().unwrap()
+            ))?;
             let mut output_file = BufWriter::new(
                 File::create(&path).with_context(ctx!("creating output file {:?}", path))?,
             );
@@ -385,6 +389,11 @@ fn pg_type_to_json_value(row: &tokio_postgres::Row, i: &str) -> Result<serde_jso
             })
             .collect::<Result<serde_json::Map<_, _>>>()?;
         Ok(serde_json::Value::Object(val))
+    } else if let Ok(val) = row.try_get::<_, Vec<&str>>(&i) {
+        dbg!(&val);
+        todo!();
+    } else if let Ok(val) = row.try_get::<_, serde_json::Value>(&i) {
+        Ok(val)
     } else if let Ok(None) = row.try_get::<_, Option<&str>>(&i) {
         Ok(serde_json::Value::Null)
     } else if let Ok(None) = row.try_get::<_, Option<i8>>(&i) {
